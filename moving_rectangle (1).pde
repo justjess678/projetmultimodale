@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import websockets.*;
+//import websockets.*;
 
 int PosX = 20;
 int PosY = 20;
@@ -15,17 +15,19 @@ void setup(){
   background(255); 
 }
 
-void createShape(String side, String hiPos, String col, String type, String size){
+void createShape(float inMouseX, float inMouseY, Boolean here, String side, String hiPos, String col, String type, String size){
   //handling default values
   if (side == ""){ side="mid"; }
   if (hiPos == ""){ hiPos="mid"; }
   if (col == ""){ col="red"; }
   if (type == ""){ type="rectangle"; }
   if (size == ""){ size="medium"; }
-  //side
   float x=0;
+  float y=0;
   int min = 0;
   int max = 0;
+  if(!here){
+  //side
   if (side == "mid"){
     min = round(screenX/3);
     max = round(screenX*2/3);
@@ -40,7 +42,6 @@ void createShape(String side, String hiPos, String col, String type, String size
   }
   x=random(min,max);
   //height
-  float y=0;
   if (hiPos == "mid"){
     min = round(screenY/3);
     max = round(screenY*2/3);
@@ -54,20 +55,23 @@ void createShape(String side, String hiPos, String col, String type, String size
     max = round(screenY);
   }
   y=random(min,max);
+  }else{
+  x = inMouseX;
+  y = inMouseY;
+  }
   //size
   float shapesize=0;
-  if (size == "medium"){
+  if (size == "moyen"){
     min = 50;
     max = 100;
-  }
-  if (size == "small"){
+  }else if (size == "petit"){
     min = 10;
     max = 50;
-  }
-  if (size == "big"){
+  }else{
     min = 100;
     max = 200;
   }
+ 
   shapesize=random(min,max);
   //colours
   color shapecolor = color(232, 38, 34);
@@ -87,21 +91,40 @@ void createShape(String side, String hiPos, String col, String type, String size
   }
    //actual shape
    PShape myShape;
-   switch(type){
-    case "rectangle": myShape = createShape(RECT,0,0,shapesize,shapesize);
-    case "triangle": myShape =  createShape(TRIANGLE,0,0,shapesize,shapesize);
-    default: myShape =  createShape(ELLIPSE,0,0,shapesize,shapesize);
+   if(type== "rectangle"){
+    myShape = createShape(RECT,0,0,shapesize*random(1,3),shapesize);
+   }else{
+    myShape =  createShape(ELLIPSE,0,0,shapesize,shapesize);
    }
    myShape.setFill(shapecolor);
    myShape.setStroke(false);
    allshapes.add(myShape);
    allX.add(x);
    allY.add(y);
+   print("vous avez cree un "+size+" "+type+" "+col+"\n");
 }
 
-void moveShape(String col, String type, String size, String newSide="", String newHiPos="",int newX=-1000,int newY=-1000){
+void moveShape(String col, String type, String size, String newSide, String newHiPos, Boolean here, int newInMouseX, int newInMouseY, int newX,int newY){
+  //find the shape to move
   
+  if(!here){
+    
+  }else{
+  
+  }
 }
+
+
+String position1 = "";
+String position2 = "";
+String forme = "";
+String couleur = "";
+String taille = "";
+String voc ="";
+float sourisX = 0.0f;
+float sourisY = 0.0f;
+Boolean vocIn = false;
+Boolean souris = false;
 
 void draw(){
   noStroke();
@@ -110,13 +133,32 @@ void draw(){
   for(int i=0;i<allshapes.size();i++){
     shape(allshapes.get(i),allX.get(i),allY.get(i));
   }
+  //GET VOCAL INPUT
+  //example sra5 output
+  voc = "sra5 Parsed=\'cetobjet\' NP=\'0\' Num_A=\'0\'";
+ 
+  position1 = "ici";
+  position2 = "";
+  forme = "rectangle";
+  couleur = "rouge";
+  taille = "moyen";
+  if(vocIn && souris){ // voice and mouse detected
+      createShape(mouseX, mouseY, (position1 == "ici"), position2, position1, couleur, forme, taille);
+      vocIn = false;
+      souris = false;
+    }
 }
 
-void keyPressed() {
-  if(key == CODED) {
-    if(keyCode == LEFT) PosX--;
-    if(keyCode == RIGHT) PosX++;
-    if(keyCode == UP) PosY--;
-    if(keyCode == DOWN) PosY++;
-  }
+//for testing only - this simulates voice input
+void keyPressed(){
+  vocIn = true;
+  print("voice input detected\n");
 }
+
+void mouseClicked() {
+  souris = true;
+  print("mouse clicked detected\n");
+  sourisX = mouseX;
+  sourisY = mouseY;
+}
+
