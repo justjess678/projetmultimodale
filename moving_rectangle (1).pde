@@ -26,44 +26,11 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
   if (col == ""){ col="red"; }
   if (type == ""){ type="rectangle"; }
   if (size == ""){ size="medium"; }
-  float x=0;
-  float y=0;
-  int min = 0;
-  int max = 0;
-  if(!here){
-    //side
-    if (side == "mid"){
-      min = round(screenX/3);
-      max = round(screenX*2/3);
-    }
-    if (side == "left"){
-      min = 0;
-      max = round(screenX/3);
-    }
-    if (side == "right"){
-      min = round(screenX*2/3);
-      max = round(screenX);
-    }
-    x=random(min,max);
-    //height
-    if (hiPos == "mid"){
-      min = round(screenY/3);
-      max = round(screenY*2/3);
-    }
-    if (hiPos == "bottom"){
-      min = 0;
-      max = round(screenY/3);
-    }
-    if (hiPos == "top"){
-      min = round(screenY*2/3);
-      max = round(screenY);
-    }
-    y=random(min,max);
-  }else{
-    //put shape at location of mou
-    x = inMouseX;
-    y = inMouseY;
-  }
+  ArrayList<Integer> coords = getCoords(side, hiPos, here, Math.round(inMouseX), Math.round(inMouseY));
+  float x=coords.get(0);
+  float y=coords.get(1);
+  int min=0;
+  int max=0;
   //size
   float shapesize=0;
   if (size == "moyen"){
@@ -76,7 +43,6 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
     min = 100;
     max = 200;
   }
- 
   shapesize=random(min,max);
   //colours
   color shapecolor = color(232, 38, 34);
@@ -120,7 +86,8 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
                break;
   }
    //actual shape
-   PShape myShape;int typeNum = -1;
+   PShape myShape;
+   int typeNum = -1;
    if(type== "rectangle"){
     myShape = createShape(RECT,0,0,shapesize*random(1,3),shapesize);
     typeNum = 1;
@@ -147,15 +114,12 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
    print("vous avez cree un "+size+" "+type+" "+col+"\n");
 }
 
-void moveShape(String col, String type, String size, String newSide, String newHiPos, Boolean here, int newInMouseX, int newInMouseY){
-  //find the shape to move
-  PShape myShape = findShape(col, type, size);
-  if(myShape != nullShape){
-    float x=0;
-    float y=0;
-    int min = 0;
-    int max = 0;
-    if(!here){
+ArrayList<Integer> getCoords(String newSide, String newHiPos, Boolean here, float newInMouseX, float newInMouseY){
+  float x=0;
+  float y=0;
+  int min = 0;
+  int max = 0;
+  if(!here){
       //side
       if (newSide == "mid"){
         min = round(screenX/3);
@@ -185,9 +149,88 @@ void moveShape(String col, String type, String size, String newSide, String newH
       }
       y=random(min,max);
     }else{
-      //here
-      
+      //put shape at location of mouse
+      x = newInMouseX;
+      y = newInMouseY;
     }
+    ArrayList<Integer> tmp = new ArrayList();
+    tmp.add(Math.round(x));
+    tmp.add(Math.round(y));
+    return tmp;
+}
+
+void moveShape(String col, String type, String size, String newSide, String newHiPos, Boolean here, float newInMouseX, float newInMouseY){
+  //find the shape to move
+  PShape myShape = findShape(col, type, size);
+  if(myShape != nullShape){
+    ArrayList<Integer> coords = getCoords(newSide, newHiPos, here, newInMouseX, newInMouseY);
+    int newX = coords.get(0);
+    int newY = coords.get(1);
+    int colNum = shapeInfo.get(myShape).get(0);
+    String newColor = getColorFromNum(colNum);
+    color shapecolor = color(232, 38, 34);
+    switch (newColor){
+     case "red": shapecolor = color(232, 38, 34);
+                 break;
+     case "blue": shapecolor = color(34, 199, 232);
+                 break;
+     case "indigo": shapecolor = color(16, 17, 102);
+                 break;
+     case "green": shapecolor = color(34, 226, 37);
+                 break;
+     case "yellow": shapecolor = color(229, 226, 41);
+                 break;
+     case "orange": shapecolor = color(224, 160, 33);
+                 break;
+     case "pink": shapecolor = color(242, 205, 240);
+                 break;
+     case "purple": shapecolor = color(114, 21, 109);
+                 break;
+     case "black": shapecolor = color(0);
+                 break;
+     case "grey": shapecolor = color(110);
+                 break;
+     case "white": shapecolor = color(255);
+                 break;
+     default: shapecolor = color(232, 38, 34);
+                 break;
+    }
+    int typeNum = shapeInfo.get(myShape).get(1);
+    String newType = getTypeFromNum(typeNum);
+    float newWidth = myShape.width;
+    float newHeight = myShape.height;
+    //make a new shape at new position
+    PShape newShape = new PShape();
+    if(newType== "rectangle"){
+      newShape = createShape(RECT,0,0,newWidth,newHeight);
+    }else if(newType== "carre"){
+      newShape = createShape(RECT,0,0,newWidth,newHeight);
+    }else if(newType != "triangle"){
+      newShape =  createShape(ELLIPSE,0,0,newWidth,newHeight);
+    }else{
+      print("NOPE\n");
+    }
+   newShape.setFill(shapecolor);
+   newShape.setStroke(false);
+   allshapes.add(newShape);
+   ArrayList<Integer> details = new ArrayList();
+   details.add(colNum);
+   details.add(typeNum);
+   details.add(Math.round(newX));
+   details.add(Math.round(newY));
+   shapeInfo.put(newShape,details);
+   //get rid of old shape
+   deleteShape(myShape);
+   print("vous avez deplace le "+newType+" "+newColor+"\n");
+  }else{
+    print("Shape not found!\n");
+  }
+}
+
+void deleteShape(PShape myShape){
+  if(myShape != nullShape){
+    allshapes.remove(myShape);
+    shapeInfo.remove(myShape);
   }else{
     print("Shape not found!\n");
   }
@@ -198,9 +241,59 @@ void deleteShape(String col, String type, String size){
   if(myShape != nullShape){
     allshapes.remove(myShape);
     shapeInfo.remove(myShape);
+    print("vous avez supprime une forme\n");
   }else{
     print("Shape not found!\n");
   }
+}
+
+String getColorFromNum(int colNum){
+  String tmpCol = "";
+  switch(colNum){
+      case 1: tmpCol = "red";
+              break;
+      case 2: tmpCol = "blue";
+              break;
+      case 3: tmpCol = "indigo";
+              break;
+      case 4: tmpCol = "green";
+              break;
+      case 5: tmpCol = "yellow";
+              break;
+      case 6: tmpCol = "orange";
+              break;
+      case 7: tmpCol = "pink";
+              break;
+      case 8: tmpCol = "purple";
+              break;
+      case 9: tmpCol = "black";
+              break;
+      case 10: tmpCol = "grey";
+              break;
+      case 11: tmpCol = "white";
+              break;
+      default: tmpCol = "red";
+              break;
+    }
+    return tmpCol;
+}
+
+String getTypeFromNum(int typeNum){
+  String tmpType = "";
+  switch(typeNum){
+      case 1: tmpType = "rectangle";
+              break;
+      case 2: tmpType = "carre";
+              break;
+      case 3: tmpType = "cercle";
+              break;
+      case 4: tmpType = "triangle";
+              print("NOPE\n");
+              break;
+      default: tmpType = "rectangle";
+              break;
+    }
+    return tmpType;
 }
 
 PShape findShape(String col, String type, String size){
@@ -223,33 +316,7 @@ PShape findShape(String col, String type, String size){
     if(isShape){
       ArrayList<Integer> tmp = shapeInfo.get(s);
       int colNum = tmp.get(0);
-      String tmpCol = "";
-      switch(colNum){
-        case 1: tmpCol = "red";
-                break;
-        case 2: tmpCol = "blue";
-                break;
-        case 3: tmpCol = "indigo";
-                break;
-        case 4: tmpCol = "green";
-                break;
-        case 5: tmpCol = "yellow";
-                break;
-        case 6: tmpCol = "orange";
-                break;
-        case 7: tmpCol = "pink";
-                break;
-        case 8: tmpCol = "purple";
-                break;
-        case 9: tmpCol = "black";
-                break;
-        case 10: tmpCol = "grey";
-                break;
-        case 11: tmpCol = "white";
-                break;
-        default: tmpCol = "red";
-                break;
-      }
+      String tmpCol = getColorFromNum(colNum);
       if(tmpCol == col){
         isShape = true;
       }else{
@@ -260,20 +327,7 @@ PShape findShape(String col, String type, String size){
     if(isShape){
       ArrayList<Integer> tmp = shapeInfo.get(s);
       int typeNum = tmp.get(1);
-      String tmpType = "";
-      switch(typeNum){
-        case 1: tmpType = "rectangle";
-                break;
-        case 2: tmpType = "carre";
-                break;
-        case 3: tmpType = "cercle";
-                break;
-        case 4: tmpType = "triangle";
-                print("NOPE\n");
-                break;
-        default: tmpType = "rectangle";
-                break;
-      }
+      String tmpType = getTypeFromNum(typeNum);
       if(tmpType==type){
         isShape=true;
       }else{
@@ -305,9 +359,13 @@ Boolean souris = false;
 void draw(){
   noStroke();
   background(255);
+  int x = 0;
+  int y = 0;
   //draws each shape
   for(int i=0;i<allshapes.size();i++){
-    shape(allshapes.get(i),allX.get(i),allY.get(i));
+    x = shapeInfo.get(allshapes.get(i)).get(2);
+    y = shapeInfo.get(allshapes.get(i)).get(3);
+    shape(allshapes.get(i),x,y);
   }
   //GET VOCAL INPUT
   //example sra5 output
