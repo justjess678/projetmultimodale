@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                "grammar.dtd">
+<!-- the default grammar language is FR  -->
+<grammar  version="1.0"
+          mode ="voice"
+          xmlns="http://www.w3.org/2001/06/grammar"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.w3.org/2001/06/grammar
+                              grammar.xsd"
+          xml:lang="fr-FR" root="answer" tag-format="semantics/1.0">
+          
+   <rule id="answer" scope="public"> 
+    <ruleref special="GARBAGE" /> 
+       <item><ruleref uri="#finalRule"/><tag>out = rules.finalRule.text</tag></item>
+    <ruleref special="GARBAGE" />
+  </rule>
+  
+  <rule id="finalRule">
+    <one-of>
+      <item><ruleref uri="#deplacement"/><tag>out.text = rules.deplacement.text</tag></item>
+      <item><ruleref uri="#créer"/><tag>out.text = rules.créer.text</tag></item>
+    </one-of>  
+    </rule>
+
+
+   <rule id="deplacement">
+    <item>déplacer</item><tag>out.tmp = "action : deplacer";</tag>
+    <item repeat="0-1"><ruleref uri="#shape"/><tag>out.tmp += " shape : " + rules.shape.text;</tag></item>
+    <item repeat="0-1"><ruleref uri="#color"/><tag>out.tmp +=" color : " + rules.color.text;</tag></item>
+    <item repeat="0-1"><ruleref uri="#position"/><tag>out.tmp +=" position : " + rules.position.text;</tag></item>
+    <tag>out.text = out.tmp;</tag>
+  </rule> 
+  
+  <rule id="position">
+    <one-of>
+      <item>en haut</item>
+      <item>en bas</item>
+      <item>à gauche</item>
+      <item>à droite</item>
+      <item>ici</item>
+    </one-of> 
+    <tag>out.text = meta.current().text;</tag>
+  </rule>
+  
+  <rule id="créer">
+  	<item> créer </item><tag>out.tmp = "action : creer ";</tag>
+    <item repeat="0-1"><ruleref uri="#shape"/><tag>out.tmp += " shape : " + rules.shape.text;</tag></item>
+    <item repeat="0-1"><ruleref uri="#color"/><tag>out.tmp +=" color : " + rules.color.text;</tag></item>
+    <item repeat="0-1"><ruleref uri="#position"/><tag>out.tmp +=" position : " + rules.position.text;</tag></item>
+    <tag>out.text = out.tmp;</tag>
+  </rule>
+  
+
+
+  <rule id="shape">
+  	<one-of>
+		  <item>triangle</item>
+		  <item>carré</item>
+		  <item>rectangle</item>
+		  <item>cercle</item>
+	  </one-of>
+    <tag>out.text = meta.current().text;</tag>
+  </rule>
+
+  
+  <rule id="color">
+  	<one-of>
+		  <item>bleu</item>
+		  <item>rouge</item>
+		  <item>vert</item>
+	  </one-of>
+    <tag>out.text = meta.current().text;</tag>
+  </rule>
+  
+  
+</grammar>
