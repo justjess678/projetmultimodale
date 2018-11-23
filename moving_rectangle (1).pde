@@ -88,6 +88,10 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
    //actual shape
    PShape myShape;
    int typeNum = -1;
+   if(type== "triangle"){
+    print("NOPE\n");
+    typeNum = 4;
+   }
    if(type== "rectangle"){
     myShape = createShape(RECT,0,0,shapesize*random(1,3),shapesize);
     typeNum = 1;
@@ -97,10 +101,6 @@ void createShape(float inMouseX, float inMouseY, Boolean here, String side, Stri
    }else{
     myShape =  createShape(ELLIPSE,0,0,shapesize,shapesize);
     typeNum = 3;
-   }
-   if(type== "triangle"){
-    print("NOPE\n");
-    typeNum = 4;
    }
    myShape.setFill(shapecolor);
    myShape.setStroke(false);
@@ -374,14 +374,25 @@ void draw(){
   position1 = "ici";
   position2 = "";
   forme = "rectangle";
-  couleur = "rouge";
+  couleur = "blue";
   taille = "moyen";
   action = "creer";
-  if(vocIn && souris && action=="creer"){ // voice and mouse detected to draw
+  //getAttributesFromSpeech(voc)
+  if(vocIn && (souris || (position1 != "ici")) && action=="creer"){ // voice and mouse detected to draw
       createShape(mouseX, mouseY, (position1 == "ici"), position2, position1, couleur, forme, taille);
       vocIn = false;
       souris = false;
     }
+  if(vocIn && (souris || (position1 != "ici")) && action=="creer"){ // voice and mouse detected to draw
+    moveShape(couleur, forme, taille, position2, position1, (position1 == "ici"), mouseX, mouseY);
+    vocIn = false;
+    souris = false;
+  }
+  if(vocIn && (souris || (position1 != "ici")) && action=="supprimer"){
+     deleteShape(couleur, forme, taille);
+     vocIn = false;
+     souris = false;
+  }
 }
 
 //for testing only - this simulates voice input
@@ -395,4 +406,53 @@ void mouseClicked() {
   print("mouse clicked detected\n");
   sourisX = mouseX;
   sourisY = mouseY;
+}
+
+void getAttributesFromSpeech(String speech){
+  if(speech.toLowerCase().contains("creer")){
+    action = "creer";
+  } else if(speech.toLowerCase().contains("deplacer")){
+    action = "deplacer";
+  } 
+   else if(speech.toLowerCase().contains("supprimer")){
+    action = "supprimer";
+  } else {
+    action = "creer";
+  }
+  if(speech.toLowerCase().contains("rectangle")){
+    forme = "rectangle";
+  } else if(speech.toLowerCase().contains("carre")){
+    forme = "carre";
+  } else if(speech.toLowerCase().contains("cercle")){
+    forme = "cercle";
+  } if(speech.toLowerCase().contains("triangle")){
+    forme = "triangle";
+  } else {
+     forme = "rectangle";
+  }
+  if(speech.toLowerCase().contains("rouge")){
+    couleur = "rouge";
+  } else if(speech.toLowerCase().contains("bleu")){
+    couleur = "bleu";
+  }  else if(speech.toLowerCase().contains("vert")){
+    couleur = "vert";
+  } else{
+    couleur = "rouge";
+  }
+  if(speech.toLowerCase().contains("haut")){
+    position1 = "top";
+  } else if(speech.toLowerCase().contains("bas")){
+    position1 = "bottom";
+  } else if(speech.toLowerCase().contains("ici")){
+    position1 = "ici";
+  } else {
+    position1 = "mid";
+  }
+  if(speech.toLowerCase().contains("gauche")){
+    position2 = "left";
+  } else if(speech.toLowerCase().contains("droite")){
+    position2 = "right";
+  } else {
+    position2 = "mid";
+  }
 }
