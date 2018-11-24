@@ -397,6 +397,15 @@ void draw(){
 
 //for testing only - this simulates voice input
 void keyPressed(){
+  if (key == 'c') {
+   forme = "cercle";
+  }
+  if (key == 'r') {
+   forme = "rectangle";
+  }
+  if (key == 's') {
+   forme = "carre";
+  }
   vocIn = true;
   print("voice input detected\n");
 }
