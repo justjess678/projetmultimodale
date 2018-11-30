@@ -3,13 +3,30 @@ import java.util.HashMap;
 import java.util.Map;
 //import websockets.*;
 
+IvyBus current_bus;
+
+String name;
+
+int PosX = 20;
+int PosY = 20;
+int rectsize = 60;
+int screenX = 640;
+int screenY = 360;
 PShape nullShape = new PShape();
 ArrayList<PShape> allshapes = new ArrayList<PShape>();
 Map<PShape,ArrayList<Integer>> shapeInfo = new HashMap();
+ArrayList<Float> allX = new ArrayList<Float>();
+ArrayList<Float> allY = new ArrayList<Float>();
 
 void setup(){
   size(640, 360);
-  background(255); 
+  background(255);
+  try {
+    current_bus = new IvyBus();
+    current_bus.start();
+  } catch (IvyException e) {
+    e.printStackTrace();
+  }
 }
 
 void createShape(float inMouseX, float inMouseY, Boolean here, String side, String hiPos, String col, String type, String size){
@@ -348,6 +365,7 @@ float sourisX = 0.0f;
 float sourisY = 0.0f;
 Boolean vocIn = false;
 Boolean souris = false;
+int t = 0;
 
 void draw(){
   noStroke();
@@ -366,7 +384,7 @@ void draw(){
  
   position1 = "ici";
   position2 = "";
-  forme = "rectangle";
+  //forme = "rectangle";
   couleur = "blue";
   taille = "moyen";
   action = "creer";
