@@ -3,16 +3,9 @@ import java.util.HashMap;
 import java.util.Map;
 //import websockets.*;
 
-int PosX = 20;
-int PosY = 20;
-int rectsize = 60;
-int screenX = 640;
-int screenY = 360;
 PShape nullShape = new PShape();
 ArrayList<PShape> allshapes = new ArrayList<PShape>();
 Map<PShape,ArrayList<Integer>> shapeInfo = new HashMap();
-ArrayList<Float> allX = new ArrayList<Float>();
-ArrayList<Float> allY = new ArrayList<Float>();
 
 void setup(){
   size(640, 360);
